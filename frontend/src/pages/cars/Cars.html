@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تخمين السيارات - تطبيق تخمين</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Cairo", sans-serif;
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      }
+      .step-active {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      }
+      .step-completed {
+        background: #3b82f6;
+      }
+      .step-inactive {
+        background: #e5e7eb;
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      .car-card {
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+      .car-card.selected {
+        border-color: #10b981;
+        background: #f0fdf4;
+      }
+      .slider-thumb::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #10b981;
+        cursor: pointer;
+      }
+      .slider-thumb::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #10b981;
+        cursor: pointer;
+        border: none;
+      }
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white p-6 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <button
+          onclick="goBack()"
+          class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+        <div class="text-center">
+          <h1 class="text-2xl font-bold">تخمين السيارات</h1>
+          <p class="text-sm opacity-90">احصل على تقييم دقيق لسيارتك</p>
+        </div>
+        <div class="w-10 h-10"></div>
+      </div>
+
+      <!-- Progress Steps -->
+      <div class="flex items-center justify-center space-x-4 space-x-reverse">
+        <div class="flex items-center">
+          <div
+            id="step1"
+            class="step-active w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+          >
+            1
+          </div>
+          <span class="mr-2 text-sm">نوع السيارة</span>
+        </div>
+        <div class="w-8 h-0.5 bg-white bg-opacity-30"></div>
+        <div class="flex items-center">
+          <div
+            id="step2"
+            class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
+          >
+            2
+          </div>
+          <span class="mr-2 text-sm opacity-70">المواصفات</span>
+        </div>
+        <div class="w-8 h-0.5 bg-white bg-opacity-30"></div>
+        <div class="flex items-center">
+          <div
+            id="step3"
+            class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
+          >
+            3
+          </div>
+          <span class="mr-2 text-sm opacity-70">النتيجة</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-6 pb-24">
+      <!-- Step 1: Car Type Selection -->
+      <div id="carTypeStep" class="space-y-6">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">
+            اختر نوع السيارة
+          </h2>
+          <p class="text-gray-600">حدد فئة السيارة التي تريد تقييمها</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div
+            class="car-card card-hover bg-white rounded-2xl p-6 cursor-pointer text-center"
+            onclick="selectCarType('sedan')"
+          >
+            <div
+              class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-4 mx-auto"
+            >
+              <svg
+                class="w-8 h-8 text-blue-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-bold text-gray-800 mb-1">سيدان</h3>
+            <p class="text-sm text-gray-600">سيارات عائلية تقليدية</p>
+          </div>
+
+          <div
+            class="car-card card-hover bg-white rounded-2xl p-6 cursor-pointer text-center"
+            onclick="selectCarType('suv')"
+          >
+            <div
+              class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-4 mx-auto"
+            >
+              <svg
+                class="w-8 h-8 text-green-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-bold text-gray-800 mb-1">SUV</h3>
+            <p class="text-sm text-gray-600">
+              سيارات رياضية متعددة الاستخدامات
+            </p>
+          </div>
+
+          <div
+            class="car-card card-hover bg-white rounded-2xl p-6 cursor-pointer text-center"
+            onclick="selectCarType('hatchback')"
+          >
+            <div
+              class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mb-4 mx-auto"
+            >
+              <svg
+                class="w-8 h-8 text-purple-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-bold text-gray-800 mb-1">هاتشباك</h3>
+            <p class="text-sm text-gray-600">سيارات صغيرة اقتصادية</p>
+          </div>
+
+          <div
+            class="car-card card-hover bg-white rounded-2xl p-6 cursor-pointer text-center"
+            onclick="selectCarType('pickup')"
+          >
+            <div
+              class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-4 mx-auto"
+            >
+              <svg
+                class="w-8 h-8 text-orange-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-bold text-gray-800 mb-1">بيك أب</h3>
+            <p class="text-sm text-gray-600">شاحنات صغيرة للعمل</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Car Specifications -->
+      <div id="carSpecsStep" class="hidden space-y-6">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">مواصفات السيارة</h2>
+          <p class="text-gray-600">أدخل المعلومات التفصيلية للسيارة</p>
+        </div>
+
+        <!-- Brand and Model -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-green-600"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+              />
+            </svg>
+            الماركة والموديل
+          </h3>
+
+          <!-- Popular Brands -->
+          <div class="grid grid-cols-4 gap-3 mb-4">
+            <button
+              class="brand-btn p-3 border-2 border-gray-200 rounded-xl text-center transition-all"
+              onclick="selectBrand(this, 'toyota')"
+            >
+              <div class="brand-logo mx-auto mb-2">
+                <span class="text-xs font-bold text-gray-600">T</span>
+              </div>
+              <span class="text-xs font-medium">تويوتا</span>
+            </button>
+            <button
+              class="brand-btn p-3 border-2 border-gray-200 rounded-xl text-center transition-all"
+              onclick="selectBrand(this, 'honda')"
+            >
+              <div class="brand-logo mx-auto mb-2">
+                <span class="text-xs font-bold text-gray-600">H</span>
+              </div>
+              <span class="text-xs font-medium">هوندا</span>
+            </button>
+            <button
+              class="brand-btn p-3 border-2 border-gray-200 rounded-xl text-center transition-all"
+              onclick="selectBrand(this, 'nissan')"
+            >
+              <div class="brand-logo mx-auto mb-2">
+                <span class="text-xs font-bold text-gray-600">N</span>
+              </div>
+              <span class="text-xs font-medium">نيسان</span>
+            </button>
+            <button
+              class="brand-btn p-3 border-2 border-gray-200 rounded-xl text-center transition-all"
+              onclick="selectBrand(this, 'hyundai')"
+            >
+              <div class="brand-logo mx-auto mb-2">
+                <span class="text-xs font-bold text-gray-600">H</span>
+              </div>
+              <span class="text-xs font-medium">هيونداي</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >الماركة</label
+              >
+              <select
+                id="brandSelect"
+                class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option>اختر الماركة</option>
+                <option value="toyota">تويوتا</option>
+                <option value="honda">هوندا</option>
+                <option value="nissan">نيسان</option>
+                <option value="hyundai">هيونداي</option>
+                <option value="kia">كيا</option>
+                <option value="mazda">مازدا</option>
+                <option value="mitsubishi">ميتسوبيشي</option>
+                <option value="bmw">BMW</option>
+                <option value="mercedes">مرسيدس</option>
+                <option value="audi">أودي</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >الموديل</label
+              >
+              <select
+                id="modelSelect"
+                class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option>اختر الموديل</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Year and Mileage -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
+              />
+            </svg>
+            سنة الصنع والمسافة المقطوعة
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >سنة الصنع</label
+              >
+              <select
+                class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option>اختر السنة</option>
+                <option>2024</option>
+                <option>2023</option>
+                <option>2022</option>
+                <option>2021</option>
+                <option>2020</option>
+                <option>2019</option>
+                <option>2018</option>
+                <option>2017</option>
+                <option>2016</option>
+                <option>2015</option>
+                <option>أقدم من 2015</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >نوع الوقود</label
+              >
+              <select
+                class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option>بنزين</option>
+                <option>ديزل</option>
+                <option>هايبرد</option>
+                <option>كهربائي</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Mileage Slider -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >المسافة المقطوعة (كيلومتر)</label
+            >
+            <div class="px-3">
+              <input
+                type="range"
+                min="0"
+                max="300000"
+                value="85000"
+                step="5000"
+                class="slider-thumb w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                oninput="updateMileageValue(this.value)"
+              />
+              <div class="flex justify-between text-sm text-gray-500 mt-1">
+                <span>0</span>
+                <span id="mileageValue" class="font-bold text-green-600"
+                  >85,000 كم</span
+                >
+                <span>300,000+</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engine and Transmission -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-red-600"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
+            </svg>
+            المحرك وناقل الحركة
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >سعة المحرك</label
+              >
+              <select
+                class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option>اختر سعة المحرك</option>
+                <option>1.0 - 1.3 لتر</option>
+                <option>1.4 - 1.6 لتر</option>
+                <option>1.7 - 2.0 لتر</option>
+                <option>2.1 - 2.5 لتر</option>
+                <option>2.6 - 3.0 لتر</option>
+                <option>أكثر من 3.0 لتر</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >ناقل الحركة</label
+              >
+              <select
+                class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option>أوتوماتيك</option>
+                <option>يدوي</option>
+                <option>CVT</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Car Condition -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-yellow-600"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
+            </svg>
+            حالة السيارة
+          </h3>
+
+          <div class="grid grid-cols-3 gap-3 mb-6">
+            <button
+              class="condition-btn p-4 border-2 border-gray-200 rounded-xl text-center transition-all"
+              onclick="selectCondition(this, 'excellent')"
+            >
+              <div
+                class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2"
+              >
+                <svg
+                  class="w-4 h-4 text-green-600"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span class="text-sm font-medium">ممتازة</span>
+              <p class="text-xs text-gray-500 mt-1">بدون خدوش</p>
+            </button>
+            <button
+              class="condition-btn p-4 border-2 border-gray-200 rounded-xl text-center transition-all"
+              onclick="selectCondition(this, 'good')"
+            >
+              <div
+                class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2"
+              >
+                <svg
+                  class="w-4 h-4 text-yellow-600"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                  />
+                </svg>
+              </div>
+              <span class="text-sm font-medium">جيدة</span>
+              <p class="text-xs text-gray-500 mt-1">خدوش بسيطة</p>
+            </button>
+            <button
+              class="condition-btn p-4 border-2 border-gray-200 rounded-xl text-center transition-all"
+              onclick="selectCondition(this, 'fair')"
+            >
+              <div
+                class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2"
+              >
+                <svg
+                  class="w-4 h-4 text-orange-600"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"
+                  />
+                </svg>
+              </div>
+              <span class="text-sm font-medium">متوسطة</span>
+              <p class="text-xs text-gray-500 mt-1">تحتاج صيانة</p>
+            </button>
+          </div>
+
+          <!-- Accident History -->
+          <div class="space-y-4">
+            <h4 class="font-medium text-gray-700">تاريخ الحوادث:</h4>
+            <div class="grid grid-cols-2 gap-3">
+              <label
+                class="flex items-center space-x-3 space-x-reverse p-3 border border-gray-200 rounded-xl cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="accident"
+                  value="none"
+                  class="w-4 h-4 text-green-600 focus:ring-green-500"
+                  checked
+                />
+                <span class="text-sm">بدون حوادث</span>
+              </label>
+              <label
+                class="flex items-center space-x-3 space-x-reverse p-3 border border-gray-200 rounded-xl cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="accident"
+                  value="minor"
+                  class="w-4 h-4 text-yellow-600 focus:ring-yellow-500"
+                />
+                <span class="text-sm">حادث بسيط</span>
+              </label>
+              <label
+                class="flex items-center space-x-3 space-x-reverse p-3 border border-gray-200 rounded-xl cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="accident"
+                  value="major"
+                  class="w-4 h-4 text-red-600 focus:ring-red-500"
+                />
+                <span class="text-sm">حادث كبير</span>
+              </label>
+              <label
+                class="flex items-center space-x-3 space-x-reverse p-3 border border-gray-200 rounded-xl cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="accident"
+                  value="flood"
+                  class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                />
+                <span class="text-sm">تضرر من فيضان</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Features -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-purple-600"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
+            </svg>
+            المميزات الإضافية
+          </h3>
+
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center space-x-3 space-x-reverse">
+              <input
+                type="checkbox"
+                class="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <span class="text-sm">مكيف هواء</span>
+            </label>
+            <label class="flex items-center space-x-3 space-x-reverse">
+              <input
+                type="checkbox"
+                class="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <span class="text-sm">نظام صوتي</span>
+            </label>
+            <label class="flex items-center space-x-3 space-x-reverse">
+              <input
+                type="checkbox"
+                class="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <span class="text-sm">نوافذ كهربائية</span>
+            </label>
+            <label class="flex items-center space-x-3 space-x-reverse">
+              <input
+                type="checkbox"
+                class="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <span class="text-sm">مقاعد جلدية</span>
+            </label>
+            <label class="flex items-center space-x-3 space-x-reverse">
+              <input
+                type="checkbox"
+                class="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <span class="text-sm">فتحة سقف</span>
+            </label>
+            <label class="flex items-center space-x-3 space-x-reverse">
+              <input
+                type="checkbox"
+                class="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <span class="text-sm">نظام ملاحة GPS</span>
+            </label>
+            <label class="flex items-center space-x-3 space-x-reverse">
+              <input
+                type="checkbox"
+                class="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <span class="text-sm">كاميرا خلفية</span>
+            </label>
+            <label class="flex items-center space-x-3 space-x-reverse">
+              <input
+                type="checkbox"
+                class="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <span class="text-sm">حساسات ركن</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Results -->
+      <div id="resultsStep" class="hidden space-y-6">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">نتيجة التخمين</h2>
+          <p class="text-gray-600">تقييم دقيق بناءً على حالة السوق الحالية</p>
+        </div>
+
+        <!-- Main Result Card -->
+        <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
+          <div
+            class="w-20 h-20 gradient-bg rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <svg
+              class="w-10 h-10 text-white"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"
+              />
+            </svg>
+          </div>
+          <h3 class="text-3xl font-bold text-gray-800 mb-2">
+            120,500 شيكل جديد
+          </h3>
+          <p class="text-gray-600 mb-4">القيمة التقديرية للسيارة</p>
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-600">النطاق السعري:</span>
+              <span class="text-sm font-medium"
+                >110,800 - 13,200 شيكل جديد</span
+              >
+            </div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-600">قيمة التبديل:</span>
+              <span class="text-sm font-medium">110,000 شيكل جديد</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">قيمة البيع السريع:</span>
+              <span class="text-sm font-medium">100,500 شيكل جديد</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Market Comparison -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">مقارنة السوق</h3>
+          <div class="space-y-4">
+            <div
+              class="flex items-center justify-between p-3 bg-green-50 rounded-xl"
+            >
+              <div class="flex items-center space-x-3 space-x-reverse">
+                <div
+                  class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-green-600"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M7 14l3-3 3 3 5-5-1.41-1.41L12 12.17 9 9.17 4.41 13.76 7 14z"
+                    />
+                  </svg>
+                </div>
+                <span class="text-sm text-gray-700">متوسط أسعار السوق</span>
+              </div>
+              <span class="text-sm font-bold text-green-600"
+                >120,800 شيكل جديد</span
+              >
+            </div>
+            <div
+              class="flex items-center justify-between p-3 bg-blue-50 rounded-xl"
+            >
+              <div class="flex items-center space-x-3 space-x-reverse">
+                <div
+                  class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-blue-600"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"
+                    />
+                  </svg>
+                </div>
+                <span class="text-sm text-gray-700">اتجاه الأسعار</span>
+              </div>
+              <span class="text-sm font-bold text-blue-600">مستقر ↗️</span>
+            </div>
+            <div
+              class="flex items-center justify-between p-3 bg-yellow-50 rounded-xl"
+            >
+              <div class="flex items-center space-x-3 space-x-reverse">
+                <div
+                  class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-yellow-600"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    />
+                  </svg>
+                </div>
+                <span class="text-sm text-gray-700">مستوى الطلب</span>
+              </div>
+              <span class="text-sm font-bold text-yellow-600">عالي</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Depreciation Chart -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">
+            توقعات انخفاض القيمة
+          </h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">بعد سنة واحدة</span>
+              <span class="text-sm font-medium">11,200 شيكل جديد (-10%)</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                class="bg-green-600 h-2 rounded-full"
+                style="width: 90%"
+              ></div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">بعد 3 سنوات</span>
+              <span class="text-sm font-medium">9,400 شيكل جديد (-25%)</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                class="bg-yellow-500 h-2 rounded-full"
+                style="width: 75%"
+              ></div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">بعد 5 سنوات</span>
+              <span class="text-sm font-medium">7,500 شيكل جديد (-40%)</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-red-500 h-2 rounded-full" style="width: 60%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selling Tips -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">
+            نصائح لزيادة قيمة البيع
+          </h3>
+          <div class="space-y-3">
+            <div
+              class="flex items-start space-x-3 space-x-reverse p-3 bg-green-50 rounded-xl"
+            >
+              <div
+                class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+              >
+                <span class="text-white text-xs font-bold">1</span>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-800">
+                  تنظيف شامل للسيارة
+                </p>
+                <p class="text-xs text-gray-600">قد يزيد القيمة بنسبة 3-5%</p>
+              </div>
+            </div>
+            <div
+              class="flex items-start space-x-3 space-x-reverse p-3 bg-blue-50 rounded-xl"
+            >
+              <div
+                class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+              >
+                <span class="text-white text-xs font-bold">2</span>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-800">
+                  إجراء صيانة أساسية
+                </p>
+                <p class="text-xs text-gray-600">تغيير الزيت وفحص الإطارات</p>
+              </div>
+            </div>
+            <div
+              class="flex items-start space-x-3 space-x-reverse p-3 bg-purple-50 rounded-xl"
+            >
+              <div
+                class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+              >
+                <span class="text-white text-xs font-bold">3</span>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-800">
+                  توثيق تاريخ الصيانة
+                </p>
+                <p class="text-xs text-gray-600">
+                  يزيد ثقة المشتري ويحسن السعر
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Action Buttons -->
+    <div
+      class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-6"
+    >
+      <div class="flex space-x-4 space-x-reverse">
+        <button
+          id="backBtn"
+          onclick="previousStep()"
+          class="hidden flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-medium"
+        >
+          السابق
+        </button>
+        <button
+          id="nextBtn"
+          onclick="nextStep()"
+          class="flex-1 gradient-bg text-white py-3 px-6 rounded-xl font-medium"
+        >
+          التالي
+        </button>
+        <button
+          id="saveBtn"
+          onclick="saveEstimation()"
+          class="hidden flex-1 bg-green-600 text-white py-3 px-6 rounded-xl font-medium"
+        >
+          حفظ التخمين
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let currentStep = 1;
+      let selectedCarType = "";
+      let selectedBrand = "";
+      let selectedCondition = "";
+
+      // Car models data
+      const carModels = {
+        toyota: ["كامري", "كورولا", "راف 4", "هايلاندر", "برادو", "لاند كروزر"],
+        honda: ["أكورد", "سيفيك", "CR-V", "بايلوت", "أوديسي"],
+        nissan: ["التيما", "سنترا", "إكس تريل", "باثفايندر", "أرمادا"],
+        hyundai: ["إلنترا", "سوناتا", "توكسون", "سانتا في", "جينيسيس"],
+        kia: ["أوبتيما", "فورتي", "سورينتو", "سبورتاج", "كادينزا"],
+        mazda: ["مازدا 3", "مازدا 6", "CX-5", "CX-9"],
+        mitsubishi: ["لانسر", "أوتلاندر", "باجيرو"],
+        bmw: ["الفئة الثالثة", "الفئة الخامسة", "X3", "X5"],
+        mercedes: ["C-Class", "E-Class", "GLC", "GLE"],
+        audi: ["A4", "A6", "Q5", "Q7"],
+      };
+
+      function goBack() {
+        alert("العودة للشاشة الرئيسية");
+      }
+
+      function selectCarType(type) {
+        selectedCarType = type;
+        document.querySelectorAll(".car-card").forEach((card) => {
+          card.classList.remove("selected");
+        });
+        event.currentTarget.classList.add("selected");
+      }
+
+      function selectBrand(element, brand) {
+        selectedBrand = brand;
+        document.querySelectorAll(".brand-btn").forEach((btn) => {
+          btn.classList.remove("border-green-500", "bg-green-50");
+          btn.classList.add("border-gray-200");
+        });
+        element.classList.remove("border-gray-200");
+        element.classList.add("border-green-500", "bg-green-50");
+
+        // Update brand select
+        document.getElementById("brandSelect").value = brand;
+
+        // Update model options
+        updateModelOptions(brand);
+      }
+
+      function updateModelOptions(brand) {
+        const modelSelect = document.getElementById("modelSelect");
+        modelSelect.innerHTML = "<option>اختر الموديل</option>";
+
+        if (carModels[brand]) {
+          carModels[brand].forEach((model) => {
+            const option = document.createElement("option");
+            option.value = model;
+            option.textContent = model;
+            modelSelect.appendChild(option);
+          });
+        }
+      }
+
+      function selectCondition(element, condition) {
+        selectedCondition = condition;
+        document.querySelectorAll(".condition-btn").forEach((btn) => {
+          btn.classList.remove("border-green-500", "bg-green-50");
+          btn.classList.add("border-gray-200");
+        });
+        element.classList.remove("border-gray-200");
+        element.classList.add("border-green-500", "bg-green-50");
+      }
+
+      function updateMileageValue(value) {
+        document.getElementById("mileageValue").textContent =
+          parseInt(value).toLocaleString() + " كم";
+      }
+
+      function nextStep() {
+        if (currentStep === 1) {
+          if (!selectedCarType) {
+            alert("يرجى اختيار نوع السيارة أولاً");
+            return;
+          }
+          showStep(2);
+        } else if (currentStep === 2) {
+          showProcessing();
+          setTimeout(() => {
+            showStep(3);
+          }, 2000);
+        }
+      }
+
+      function previousStep() {
+        if (currentStep > 1) {
+          showStep(currentStep - 1);
+        }
+      }
+
+      function showStep(step) {
+        // Hide all steps
+        document.getElementById("carTypeStep").classList.add("hidden");
+        document.getElementById("carSpecsStep").classList.add("hidden");
+        document.getElementById("resultsStep").classList.add("hidden");
+
+        // Update step indicators
+        for (let i = 1; i <= 3; i++) {
+          const stepEl = document.getElementById(`step${i}`);
+          if (i < step) {
+            stepEl.className =
+              "step-completed w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold";
+          } else if (i === step) {
+            stepEl.className =
+              "step-active w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold";
+          } else {
+            stepEl.className =
+              "step-inactive w-8 h-8 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold";
+          }
+        }
+
+        // Show current step
+        if (step === 1) {
+          document.getElementById("carTypeStep").classList.remove("hidden");
+          document.getElementById("backBtn").classList.add("hidden");
+          document.getElementById("nextBtn").classList.remove("hidden");
+          document.getElementById("saveBtn").classList.add("hidden");
+        } else if (step === 2) {
+          document.getElementById("carSpecsStep").classList.remove("hidden");
+          document.getElementById("backBtn").classList.remove("hidden");
+          document.getElementById("nextBtn").classList.remove("hidden");
+          document.getElementById("saveBtn").classList.add("hidden");
+          document.getElementById("nextBtn").textContent = "احسب التخمين";
+        } else if (step === 3) {
+          document.getElementById("resultsStep").classList.remove("hidden");
+          document.getElementById("backBtn").classList.remove("hidden");
+          document.getElementById("nextBtn").classList.add("hidden");
+          document.getElementById("saveBtn").classList.remove("hidden");
+        }
+
+        currentStep = step;
+      }
+
+      function showProcessing() {
+        const nextBtn = document.getElementById("nextBtn");
+        nextBtn.innerHTML =
+          '<svg class="animate-spin w-5 h-5 mx-auto" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+        nextBtn.disabled = true;
+      }
+
+      function saveEstimation() {
+        alert(
+          'تم حفظ تخمين السيارة بنجاح! يمكنك العثور عليه في قسم "تخميناتي"'
+        );
+      }
+
+      // Update brand select when changed
+      document
+        .getElementById("brandSelect")
+        .addEventListener("change", function () {
+          updateModelOptions(this.value);
+        });
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'974a983af3115dab',t:'MTc1NjExOTcyMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>

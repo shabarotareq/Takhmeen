@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إضافة تخمين جديد - تقييم الأصول</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Cairo", sans-serif;
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      .input-focus {
+        transition: all 0.2s ease;
+      }
+      .input-focus:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+      }
+      .category-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 2px solid #e5e7eb;
+      }
+      .category-card:hover {
+        transform: scale(1.02);
+        border-color: #3b82f6;
+      }
+      .category-card.selected {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        border-color: #1d4ed8;
+      }
+      .subcategory-card {
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .subcategory-card:hover {
+        background-color: #f1f5f9;
+      }
+      .subcategory-card.selected {
+        background-color: #dbeafe;
+        border-color: #3b82f6;
+      }
+      .condition-badge {
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .condition-badge:hover {
+        transform: scale(1.05);
+      }
+      .condition-badge.selected {
+        background: #3b82f6;
+        color: white;
+      }
+      .image-upload {
+        border: 2px dashed #d1d5db;
+        transition: all 0.3s ease;
+      }
+      .image-upload:hover {
+        border-color: #3b82f6;
+        background-color: #f0f9ff;
+      }
+      .image-upload.dragover {
+        border-color: #3b82f6;
+        background-color: #dbeafe;
+      }
+      .floating-action {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 50;
+      }
+      .step-indicator {
+        position: relative;
+      }
+      .step-indicator::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        background: #e5e7eb;
+        transform: translateY(-50%);
+        z-index: -1;
+      }
+      .step-active {
+        background: #3b82f6;
+        color: white;
+      }
+      .step-completed {
+        background: #10b981;
+        color: white;
+      }
+      .step-pending {
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+      .price-input {
+        position: relative;
+      }
+      .currency-symbol {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+      }
+      .feature-checkbox {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #d1d5db;
+        border-radius: 4px;
+        position: relative;
+        cursor: pointer;
+      }
+      .feature-checkbox:checked {
+        background: #3b82f6;
+        border-color: #3b82f6;
+      }
+      .feature-checkbox:checked::after {
+        content: "✓";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .location-input {
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>')
+          no-repeat right 12px center;
+        background-size: 20px;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white p-6 shadow-xl">
+      <div class="flex items-center justify-between mb-4">
+        <button
+          onclick="goBack()"
+          class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+        <div class="text-center">
+          <h1 class="text-2xl font-bold">تقييم أصل جديد</h1>
+          <p class="text-sm opacity-90">عقارات • سيارات • معدات • آلات</p>
+        </div>
+        <button
+          onclick="saveDraft()"
+          class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Progress Steps -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-4 space-x-reverse w-full">
+          <div class="step-indicator flex items-center">
+            <div
+              id="step1"
+              class="step-active w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+            >
+              1
+            </div>
+            <span class="text-xs mr-2">النوع</span>
+          </div>
+          <div class="step-indicator flex items-center">
+            <div
+              id="step2"
+              class="step-pending w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+            >
+              2
+            </div>
+            <span class="text-xs mr-2">التفاصيل</span>
+          </div>
+          <div class="step-indicator flex items-center">
+            <div
+              id="step3"
+              class="step-pending w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+            >
+              3
+            </div>
+            <span class="text-xs mr-2">الصور</span>
+          </div>
+          <div class="step-indicator flex items-center">
+            <div
+              id="step4"
+              class="step-pending w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+            >
+              4
+            </div>
+            <span class="text-xs mr-2">التقييم</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-6 pb-32">
+      <!-- Step 1: Asset Type Selection -->
+      <div id="stepContent1" class="step-content">
+        <!-- Main Categories -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 11H5m14-4H3m16 8H1"
+              />
+            </svg>
+            اختر نوع الأصل
+          </h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div
+              class="category-card p-6 rounded-2xl text-center"
+              onclick="selectMainCategory(this, 'real_estate')"
+            >
+              <div
+                class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <svg
+                  class="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  />
+                </svg>
+              </div>
+              <h4 class="font-bold text-lg text-gray-800 mb-2">العقارات</h4>
+              <p class="text-sm text-gray-600">منازل، شقق، أراضي، مكاتب</p>
+            </div>
+
+            <div
+              class="category-card p-6 rounded-2xl text-center"
+              onclick="selectMainCategory(this, 'vehicles')"
+            >
+              <div
+                class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <svg
+                  class="w-8 h-8 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"
+                  />
+                </svg>
+              </div>
+              <h4 class="font-bold text-lg text-gray-800 mb-2">السيارات</h4>
+              <p class="text-sm text-gray-600">سيارات، دراجات، شاحنات</p>
+            </div>
+
+            <div
+              class="category-card p-6 rounded-2xl text-center"
+              onclick="selectMainCategory(this, 'equipment')"
+            >
+              <div
+                class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <svg
+                  class="w-8 h-8 text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+              <h4 class="font-bold text-lg text-gray-800 mb-2">المعدات</h4>
+              <p class="text-sm text-gray-600">أدوات، معدات طبية، إلكترونيات</p>
+            </div>
+
+            <div
+              class="category-card p-6 rounded-2xl text-center"
+              onclick="selectMainCategory(this, 'machinery')"
+            >
+              <div
+                class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <svg
+                  class="w-8 h-8 text-orange-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                  />
+                </svg>
+              </div>
+              <h4 class="font-bold text-lg text-gray-800 mb-2">الآلات</h4>
+              <p class="text-sm text-gray-600">آلات صناعية، زراعية، إنشائية</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subcategories -->
+        <div
+          id="subcategoriesSection"
+          class="bg-white rounded-2xl p-6 shadow-lg mb-6 hidden"
+        >
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 10h16M4 14h16M4 18h16"
+              />
+            </svg>
+            اختر الفئة الفرعية
+          </h3>
+          <div id="subcategoriesList" class="grid grid-cols-1 gap-3">
+            <!-- Subcategories will be populated here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Asset Details -->
+      <div id="stepContent2" class="step-content hidden">
+        <!-- Basic Information -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+            المعلومات الأساسية
+          </h3>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >اسم/وصف الأصل *</label
+              >
+              <input
+                type="text"
+                id="assetName"
+                placeholder="مثال: فيلا في الجابرية - 400 متر"
+                class="input-focus w-full p-4 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                maxlength="100"
+              />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4" id="basicDetailsGrid">
+              <!-- Dynamic fields will be populated here based on category -->
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >الموقع *</label
+              >
+              <input
+                type="text"
+                id="location"
+                placeholder="المنطقة، المحافظة، الكويت"
+                class="location-input input-focus w-full p-4 pr-12 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Condition Assessment -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            تقييم الحالة
+          </h3>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div
+              class="condition-badge p-4 border-2 border-gray-200 rounded-xl text-center"
+              onclick="selectCondition(this, 'excellent')"
+            >
+              <div
+                class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2"
+              >
+                <svg
+                  class="w-4 h-4 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <span class="text-sm font-medium">ممتازة</span>
+            </div>
+
+            <div
+              class="condition-badge p-4 border-2 border-gray-200 rounded-xl text-center"
+              onclick="selectCondition(this, 'very_good')"
+            >
+              <div
+                class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2"
+              >
+                <svg
+                  class="w-4 h-4 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4"
+                  />
+                </svg>
+              </div>
+              <span class="text-sm font-medium">جيدة جداً</span>
+            </div>
+
+            <div
+              class="condition-badge p-4 border-2 border-gray-200 rounded-xl text-center"
+              onclick="selectCondition(this, 'good')"
+            >
+              <div
+                class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2"
+              >
+                <svg
+                  class="w-4 h-4 text-yellow-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01"
+                  />
+                </svg>
+              </div>
+              <span class="text-sm font-medium">جيدة</span>
+            </div>
+
+            <div
+              class="condition-badge p-4 border-2 border-gray-200 rounded-xl text-center"
+              onclick="selectCondition(this, 'fair')"
+            >
+              <div
+                class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2"
+              >
+                <svg
+                  class="w-4 h-4 text-orange-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4m0 4h.01"
+                  />
+                </svg>
+              </div>
+              <span class="text-sm font-medium">مقبولة</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Features & Specifications -->
+        <div
+          id="featuresSection"
+          class="bg-white rounded-2xl p-6 shadow-lg mb-6"
+        >
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            المواصفات والمميزات
+          </h3>
+          <div id="featuresList" class="grid grid-cols-2 gap-4">
+            <!-- Features will be populated based on category -->
+          </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h7"
+              />
+            </svg>
+            ملاحظات إضافية
+          </h3>
+          <textarea
+            id="additionalNotes"
+            placeholder="أي معلومات إضافية مهمة للتقييم..."
+            class="input-focus w-full p-4 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none"
+            rows="4"
+            maxlength="500"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Step 3: Images -->
+      <div id="stepContent3" class="step-content hidden">
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            إضافة الصور
+          </h3>
+
+          <div
+            class="image-upload p-8 rounded-xl text-center mb-6"
+            onclick="document.getElementById('imageInput').click()"
+          >
+            <svg
+              class="w-16 h-16 text-gray-400 mx-auto mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
+            </svg>
+            <p class="text-gray-600 font-medium text-lg mb-2">
+              اضغط لإضافة صور
+            </p>
+            <p class="text-sm text-gray-500">
+              أو اسحب الصور هنا • حتى 10 صور • JPG, PNG
+            </p>
+          </div>
+          <input
+            type="file"
+            id="imageInput"
+            multiple
+            accept="image/*"
+            class="hidden"
+            onchange="handleImageUpload(this)"
+          />
+
+          <!-- Image Categories -->
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-800 mb-3">
+              أنواع الصور المطلوبة:
+            </h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                <svg
+                  class="w-4 h-4 text-blue-600 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                </svg>
+                <span>صور عامة خارجية</span>
+              </div>
+              <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                <svg
+                  class="w-4 h-4 text-green-600 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                </svg>
+                <span>صور داخلية/تفاصيل</span>
+              </div>
+              <div class="flex items-center p-3 bg-yellow-50 rounded-lg">
+                <svg
+                  class="w-4 h-4 text-yellow-600 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                <span>المستندات/الأوراق</span>
+              </div>
+              <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                <svg
+                  class="w-4 h-4 text-purple-600 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <span>عيوب أو أضرار</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="imagePreview" class="grid grid-cols-2 gap-4 hidden"></div>
+        </div>
+      </div>
+
+      <!-- Step 4: Valuation -->
+      <div id="stepContent4" class="step-content hidden">
+        <!-- Estimated Value -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+              />
+            </svg>
+            التقييم المتوقع
+          </h3>
+
+          <div class="space-y-4">
+            <div class="price-input">
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >القيمة المتوقعة *</label
+              >
+              <input
+                type="number"
+                id="estimatedValue"
+                placeholder="0"
+                class="input-focus w-full p-4 pr-16 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-lg font-medium"
+                min="0"
+                step="100"
+              />
+              <span class="currency-symbol text-lg font-medium">د.ك</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="price-input">
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >الحد الأدنى</label
+                >
+                <input
+                  type="number"
+                  id="minValue"
+                  placeholder="0"
+                  class="input-focus w-full p-3 pr-12 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                  min="0"
+                  step="100"
+                />
+                <span class="currency-symbol">د.ك</span>
+              </div>
+              <div class="price-input">
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >الحد الأقصى</label
+                >
+                <input
+                  type="number"
+                  id="maxValue"
+                  placeholder="0"
+                  class="input-focus w-full p-3 pr-12 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                  min="0"
+                  step="100"
+                />
+                <span class="currency-symbol">د.ك</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Valuation Method -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+            أساس التقييم
+          </h3>
+
+          <div class="space-y-3">
+            <label
+              class="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50"
+            >
+              <input
+                type="radio"
+                name="valuationMethod"
+                value="market_comparison"
+                class="w-5 h-5 text-blue-600"
+                checked
+              />
+              <div class="mr-3">
+                <div class="font-medium text-gray-800">مقارنة السوق</div>
+                <div class="text-sm text-gray-600">
+                  بناءً على أسعار مماثلة في السوق
+                </div>
+              </div>
+            </label>
+            <label
+              class="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50"
+            >
+              <input
+                type="radio"
+                name="valuationMethod"
+                value="cost_approach"
+                class="w-5 h-5 text-blue-600"
+              />
+              <div class="mr-3">
+                <div class="font-medium text-gray-800">التكلفة الاستبدالية</div>
+                <div class="text-sm text-gray-600">
+                  تكلفة الحصول على بديل مماثل
+                </div>
+              </div>
+            </label>
+            <label
+              class="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50"
+            >
+              <input
+                type="radio"
+                name="valuationMethod"
+                value="income_approach"
+                class="w-5 h-5 text-blue-600"
+              />
+              <div class="mr-3">
+                <div class="font-medium text-gray-800">العائد المتوقع</div>
+                <div class="text-sm text-gray-600">
+                  بناءً على الدخل أو العائد المتوقع
+                </div>
+              </div>
+            </label>
+            <label
+              class="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50"
+            >
+              <input
+                type="radio"
+                name="valuationMethod"
+                value="expert_opinion"
+                class="w-5 h-5 text-blue-600"
+              />
+              <div class="mr-3">
+                <div class="font-medium text-gray-800">رأي خبير</div>
+                <div class="text-sm text-gray-600">
+                  تقدير شخصي بناءً على الخبرة
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Confidence Level -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+            مستوى الثقة في التقييم
+          </h3>
+
+          <div class="mb-4">
+            <input
+              type="range"
+              min="10"
+              max="100"
+              value="70"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              oninput="updateConfidence(this.value)"
+            />
+            <div class="flex justify-between text-xs text-gray-500 mt-2">
+              <span>10%</span>
+              <span>50%</span>
+              <span>100%</span>
+            </div>
+          </div>
+          <div class="text-center">
+            <span class="text-3xl font-bold text-blue-600" id="confidenceValue"
+              >70%</span
+            >
+            <p class="text-sm text-gray-600 mt-1" id="confidenceText">
+              ثقة عالية
+            </p>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div
+          class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200"
+        >
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <svg
+              class="w-5 h-5 ml-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            ملخص التقييم
+          </h3>
+          <div id="valuationSummary" class="space-y-3 text-sm">
+            <!-- Summary will be populated here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="flex justify-between items-center mt-8">
+        <button
+          id="prevBtn"
+          onclick="previousStep()"
+          class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 hidden"
+        >
+          السابق
+        </button>
+        <div class="flex space-x-3 space-x-reverse">
+          <button
+            id="nextBtn"
+            onclick="nextStep()"
+            class="px-8 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700"
+          >
+            التالي
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Floating Action Buttons -->
+    <div class="floating-action">
+      <div class="flex flex-col space-y-3">
+        <button
+          onclick="saveDraft()"
+          class="w-14 h-14 bg-gray-600 text-white rounded-full shadow-lg hover:bg-gray-700 flex items-center justify-center"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
+            />
+          </svg>
+        </button>
+        <button
+          id="submitBtn"
+          onclick="submitValuation()"
+          class="w-16 h-16 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 flex items-center justify-center hidden"
+        >
+          <svg
+            class="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let currentStep = 1;
+      let selectedMainCategory = "";
+      let selectedSubcategory = "";
+      let selectedCondition = "";
+      let uploadedImages = [];
+      let selectedFeatures = [];
+
+      const subcategories = {
+        real_estate: [
+          { id: "house", name: "منزل/فيلا", icon: "🏠" },
+          { id: "apartment", name: "شقة", icon: "🏢" },
+          { id: "land", name: "أرض", icon: "🏞️" },
+          { id: "commercial", name: "عقار تجاري", icon: "🏪" },
+          { id: "office", name: "مكتب", icon: "🏢" },
+          { id: "warehouse", name: "مستودع", icon: "🏭" },
+        ],
+        vehicles: [
+          { id: "car", name: "سيارة", icon: "🚗" },
+          { id: "suv", name: "سيارة دفع رباعي", icon: "🚙" },
+          { id: "truck", name: "شاحنة", icon: "🚛" },
+          { id: "motorcycle", name: "دراجة نارية", icon: "🏍️" },
+          { id: "bus", name: "حافلة", icon: "🚌" },
+          { id: "boat", name: "قارب", icon: "⛵" },
+        ],
+        equipment: [
+          { id: "medical", name: "معدات طبية", icon: "🏥" },
+          { id: "electronics", name: "إلكترونيات", icon: "💻" },
+          { id: "tools", name: "أدوات", icon: "🔧" },
+          { id: "furniture", name: "أثاث", icon: "🪑" },
+          { id: "sports", name: "معدات رياضية", icon: "⚽" },
+          { id: "kitchen", name: "معدات مطبخ", icon: "🍳" },
+        ],
+        machinery: [
+          { id: "construction", name: "آلات إنشائية", icon: "🚜" },
+          { id: "agricultural", name: "آلات زراعية", icon: "🚜" },
+          { id: "industrial", name: "آلات صناعية", icon: "⚙️" },
+          { id: "printing", name: "آلات طباعة", icon: "🖨️" },
+          { id: "textile", name: "آلات نسيج", icon: "🧵" },
+          { id: "food", name: "آلات غذائية", icon: "🏭" },
+        ],
+      };
+
+      const features = {
+        real_estate: [
+          "مسبح",
+          "حديقة",
+          "مصعد",
+          "موقف سيارات",
+          "أمن وحراسة",
+          "مولد كهرباء",
+          "تكييف مركزي",
+          "تدفئة مركزية",
+          "إطلالة بحرية",
+          "قريب من الخدمات",
+        ],
+        vehicles: [
+          "تكييف",
+          "نظام ملاحة",
+          "كاميرا خلفية",
+          "مقاعد جلدية",
+          "فتحة سقف",
+          "نظام صوتي متطور",
+          "مثبت سرعة",
+          "حساسات ركن",
+          "إضاءة LED",
+          "عجلات سبائك",
+        ],
+        equipment: [
+          "ضمان ساري",
+          "دليل الاستخدام",
+          "قطع غيار متوفرة",
+          "صيانة دورية",
+          "شهادة جودة",
+          "تدريب مجاني",
+          "دعم فني",
+          "تحديثات مجانية",
+          "متوافق دولياً",
+          "موفر للطاقة",
+        ],
+        machinery: [
+          "صيانة حديثة",
+          "قطع غيار أصلية",
+          "دليل التشغيل",
+          "شهادة السلامة",
+          "تدريب المشغلين",
+          "ضمان ممتد",
+          "كفاءة عالية",
+          "استهلاك منخفض",
+          "تقنية حديثة",
+          "سهولة الصيانة",
+        ],
+      };
+
+      function goBack() {
+        if (currentStep > 1) {
+          previousStep();
+        } else {
+          if (confirm("هل تريد الخروج؟ سيتم فقدان البيانات غير المحفوظة.")) {
+            alert("العودة لصفحة تقييم الأصول");
+          }
+        }
+      }
+
+      function selectMainCategory(element, category) {
+        document.querySelectorAll(".category-card").forEach((card) => {
+          card.classList.remove("selected");
+        });
+
+        element.classList.add("selected");
+        selectedMainCategory = category;
+
+        showSubcategories(category);
+      }
+
+      function showSubcategories(category) {
+        const section = document.getElementById("subcategoriesSection");
+        const list = document.getElementById("subcategoriesList");
+
+        list.innerHTML = "";
+
+        subcategories[category].forEach((sub) => {
+          const div = document.createElement("div");
+          div.className =
+            "subcategory-card p-4 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:bg-gray-50";
+          div.onclick = () => selectSubcategory(div, sub.id);
+          div.innerHTML = `
+                    <span class="text-2xl ml-3">${sub.icon}</span>
+                    <span class="font-medium text-gray-800">${sub.name}</span>
+                `;
+          list.appendChild(div);
+        });
+
+        section.classList.remove("hidden");
+      }
+
+      function selectSubcategory(element, subcategory) {
+        document.querySelectorAll(".subcategory-card").forEach((card) => {
+          card.classList.remove("selected");
+        });
+
+        element.classList.add("selected");
+        selectedSubcategory = subcategory;
+      }
+
+      function selectCondition(element, condition) {
+        document.querySelectorAll(".condition-badge").forEach((badge) => {
+          badge.classList.remove("selected");
+        });
+
+        element.classList.add("selected");
+        selectedCondition = condition;
+      }
+
+      function populateBasicDetails() {
+        const grid = document.getElementById("basicDetailsGrid");
+        grid.innerHTML = "";
+
+        if (selectedMainCategory === "real_estate") {
+          grid.innerHTML = `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">المساحة (متر مربع)</label>
+                        <input type="number" id="area" placeholder="400" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">عدد الغرف</label>
+                        <input type="number" id="rooms" placeholder="4" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">عدد الحمامات</label>
+                        <input type="number" id="bathrooms" placeholder="3" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">سنة البناء</label>
+                        <input type="number" id="buildYear" placeholder="2020" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                `;
+        } else if (selectedMainCategory === "vehicles") {
+          grid.innerHTML = `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الماركة</label>
+                        <input type="text" id="brand" placeholder="تويوتا" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الموديل</label>
+                        <input type="text" id="model" placeholder="كامري" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">سنة الصنع</label>
+                        <input type="number" id="year" placeholder="2022" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">المسافة المقطوعة (كم)</label>
+                        <input type="number" id="mileage" placeholder="50000" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                `;
+        } else if (selectedMainCategory === "equipment") {
+          grid.innerHTML = `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الماركة</label>
+                        <input type="text" id="brand" placeholder="سامسونج" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الموديل</label>
+                        <input type="text" id="model" placeholder="Galaxy S23" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">سنة الشراء</label>
+                        <input type="number" id="purchaseYear" placeholder="2023" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الرقم التسلسلي</label>
+                        <input type="text" id="serialNumber" placeholder="SN123456789" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                `;
+        } else if (selectedMainCategory === "machinery") {
+          grid.innerHTML = `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الماركة</label>
+                        <input type="text" id="brand" placeholder="كاتربيلر" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الموديل</label>
+                        <input type="text" id="model" placeholder="320D" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">سنة الصنع</label>
+                        <input type="number" id="year" placeholder="2021" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ساعات التشغيل</label>
+                        <input type="number" id="operatingHours" placeholder="1500" class="input-focus w-full p-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                `;
+        }
+      }
+
+      function populateFeatures() {
+        const list = document.getElementById("featuresList");
+        list.innerHTML = "";
+
+        if (features[selectedMainCategory]) {
+          features[selectedMainCategory].forEach((feature) => {
+            const div = document.createElement("div");
+            div.className = "flex items-center";
+            div.innerHTML = `
+                        <input type="checkbox" class="feature-checkbox ml-3" value="${feature}" onchange="toggleFeature('${feature}', this.checked)">
+                        <span class="text-sm text-gray-700">${feature}</span>
+                    `;
+            list.appendChild(div);
+          });
+        }
+      }
+
+      function toggleFeature(feature, checked) {
+        if (checked) {
+          selectedFeatures.push(feature);
+        } else {
+          selectedFeatures = selectedFeatures.filter((f) => f !== feature);
+        }
+      }
+
+      function handleImageUpload(input) {
+        const files = Array.from(input.files);
+
+        files.forEach((file) => {
+          if (uploadedImages.length < 10) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              uploadedImages.push({
+                file: file,
+                url: e.target.result,
+                name: file.name,
+              });
+              updateImagePreview();
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      function updateImagePreview() {
+        const preview = document.getElementById("imagePreview");
+        preview.innerHTML = "";
+
+        if (uploadedImages.length > 0) {
+          preview.classList.remove("hidden");
+
+          uploadedImages.forEach((image, index) => {
+            const imageDiv = document.createElement("div");
+            imageDiv.className = "relative";
+            imageDiv.innerHTML = `
+                        <img src="${image.url}" class="w-full h-32 object-cover rounded-lg">
+                        <button onclick="removeImage(${index})" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">
+                            ×
+                        </button>
+                        <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-2 rounded-b-lg truncate">
+                            ${image.name}
+                        </div>
+                    `;
+            preview.appendChild(imageDiv);
+          });
+        } else {
+          preview.classList.add("hidden");
+        }
+      }
+
+      function removeImage(index) {
+        uploadedImages.splice(index, 1);
+        updateImagePreview();
+      }
+
+      function updateConfidence(value) {
+        document.getElementById("confidenceValue").textContent = value + "%";
+
+        let text = "";
+        if (value < 30) text = "ثقة منخفضة";
+        else if (value < 60) text = "ثقة متوسطة";
+        else if (value < 80) text = "ثقة عالية";
+        else text = "ثقة عالية جداً";
+
+        document.getElementById("confidenceText").textContent = text;
+      }
+
+      function nextStep() {
+        if (validateCurrentStep()) {
+          if (currentStep < 4) {
+            currentStep++;
+            updateStepDisplay();
+
+            if (currentStep === 2) {
+              populateBasicDetails();
+              populateFeatures();
+            } else if (currentStep === 4) {
+              updateValuationSummary();
+              document.getElementById("submitBtn").classList.remove("hidden");
+            }
+          }
+        }
+      }
+
+      function previousStep() {
+        if (currentStep > 1) {
+          currentStep--;
+          updateStepDisplay();
+          document.getElementById("submitBtn").classList.add("hidden");
+        }
+      }
+
+      function validateCurrentStep() {
+        if (currentStep === 1) {
+          if (!selectedMainCategory) {
+            alert("يرجى اختيار نوع الأصل");
+            return false;
+          }
+          if (!selectedSubcategory) {
+            alert("يرجى اختيار الفئة الفرعية");
+            return false;
+          }
+        } else if (currentStep === 2) {
+          const assetName = document.getElementById("assetName").value.trim();
+          const location = document.getElementById("location").value.trim();
+
+          if (!assetName) {
+            alert("يرجى إدخال اسم/وصف الأصل");
+            return false;
+          }
+          if (!location) {
+            alert("يرجى إدخال الموقع");
+            return false;
+          }
+          if (!selectedCondition) {
+            alert("يرجى تحديد حالة الأصل");
+            return false;
+          }
+        } else if (currentStep === 4) {
+          const estimatedValue =
+            document.getElementById("estimatedValue").value;
+
+          if (!estimatedValue || estimatedValue <= 0) {
+            alert("يرجى إدخال القيمة المتوقعة");
+            return false;
+          }
+        }
+        return true;
+      }
+
+      function updateStepDisplay() {
+        document.querySelectorAll(".step-content").forEach((content) => {
+          content.classList.add("hidden");
+        });
+
+        document
+          .getElementById(`stepContent${currentStep}`)
+          .classList.remove("hidden");
+
+        for (let i = 1; i <= 4; i++) {
+          const stepElement = document.getElementById(`step${i}`);
+          stepElement.className =
+            "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold";
+
+          if (i < currentStep) {
+            stepElement.className += " step-completed";
+          } else if (i === currentStep) {
+            stepElement.className += " step-active";
+          } else {
+            stepElement.className += " step-pending";
+          }
+        }
+
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        if (currentStep === 1) {
+          prevBtn.classList.add("hidden");
+        } else {
+          prevBtn.classList.remove("hidden");
+        }
+
+        if (currentStep === 4) {
+          nextBtn.textContent = "مراجعة";
+        } else {
+          nextBtn.textContent = "التالي";
+        }
+      }
+
+      function updateValuationSummary() {
+        const summary = document.getElementById("valuationSummary");
+        const assetName = document.getElementById("assetName").value;
+        const location = document.getElementById("location").value;
+        const estimatedValue = document.getElementById("estimatedValue").value;
+
+        summary.innerHTML = `
+                <div class="flex justify-between">
+                    <span class="text-gray-600">نوع الأصل:</span>
+                    <span class="font-medium">${getCategoryName(
+                      selectedMainCategory
+                    )} - ${getSubcategoryName(selectedSubcategory)}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">الاسم:</span>
+                    <span class="font-medium">${assetName}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">الموقع:</span>
+                    <span class="font-medium">${location}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">الحالة:</span>
+                    <span class="font-medium">${getConditionName(
+                      selectedCondition
+                    )}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">عدد الصور:</span>
+                    <span class="font-medium">${
+                      uploadedImages.length
+                    } صورة</span>
+                </div>
+                <div class="flex justify-between border-t pt-3 mt-3">
+                    <span class="text-gray-600">القيمة المتوقعة:</span>
+                    <span class="font-bold text-lg text-blue-600">${estimatedValue} د.ك</span>
+                </div>
+            `;
+      }
+
+      function getCategoryName(category) {
+        const names = {
+          real_estate: "العقارات",
+          vehicles: "السيارات",
+          equipment: "المعدات",
+          machinery: "الآلات",
+        };
+        return names[category] || category;
+      }
+
+      function getSubcategoryName(subcategory) {
+        for (const category in subcategories) {
+          const sub = subcategories[category].find((s) => s.id === subcategory);
+          if (sub) return sub.name;
+        }
+        return subcategory;
+      }
+
+      function getConditionName(condition) {
+        const names = {
+          excellent: "ممتازة",
+          very_good: "جيدة جداً",
+          good: "جيدة",
+          fair: "مقبولة",
+        };
+        return names[condition] || condition;
+      }
+
+      function saveDraft() {
+        alert("تم حفظ التقييم كمسودة");
+      }
+
+      function submitValuation() {
+        if (validateCurrentStep()) {
+          alert("تم إرسال التقييم بنجاح! سيظهر في قائمة تقييماتك.");
+          setTimeout(() => {
+            alert("العودة لصفحة تقييم الأصول");
+          }, 1000);
+        }
+      }
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'974afed320875dab',t:'MTc1NjEyMzkyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>

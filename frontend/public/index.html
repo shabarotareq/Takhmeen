@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تخمين - قيمتك الحقيقية بلمسة ذكاء</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Cairo", sans-serif;
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+      .ai-pulse {
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+      .splash-screen {
+        animation: fadeOut 3s ease-in-out forwards;
+      }
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        80% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Splash Screen -->
+    <div
+      id="splashScreen"
+      class="splash-screen fixed inset-0 gradient-bg flex items-center justify-center z-50"
+    >
+      <div class="text-center text-white">
+        <div class="mb-8">
+          <svg
+            class="w-24 h-24 mx-auto mb-4 ai-pulse"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+            />
+          </svg>
+        </div>
+        <h1 class="text-4xl font-bold mb-2">تخمين</h1>
+        <p class="text-xl opacity-90">قيمتك الحقيقية بلمسة ذكاء</p>
+      </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="opacity-0 transition-opacity duration-1000">
+      <!-- Header -->
+      <header class="gradient-bg text-white p-6 rounded-b-3xl shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <div
+              class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center"
+            >
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold">تخمين</h1>
+              <p class="text-sm opacity-90">مرحباً بك، أحمد!</p>
+            </div>
+          </div>
+          <button
+            class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="bg-white bg-opacity-10 rounded-2xl p-4 text-center">
+          <p class="text-lg font-semibold">اكتشف القيمة الحقيقية لأصولك</p>
+          <p class="text-sm opacity-90 mt-1">
+            تقييم دقيق وموثوق بالذكاء الاصطناعي
+          </p>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="p-6 pb-24">
+        <!-- Service Categories -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <!-- Real Estate Card -->
+          <div
+            class="card-hover bg-white rounded-2xl p-6 shadow-lg cursor-pointer"
+            onclick="window.location.href='../src/pages/realeState/RealEstate.html'"
+          >
+            <div
+              class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-4 mx-auto"
+            >
+              <svg
+                class="w-8 h-8 text-blue-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 text-center mb-2">
+              تخمين العقارات
+            </h3>
+            <p class="text-gray-600 text-center text-sm mb-4">
+              شقق، فلل، أراضي، مكاتب تجارية
+            </p>
+            <div class="bg-blue-50 rounded-lg p-3 text-center">
+              <span class="text-blue-600 font-semibold text-sm">
+                ابدأ التقييم
+              </span>
+            </div>
+          </div>
+
+          <!-- Cars Card -->
+          <div
+            class="card-hover bg-white rounded-2xl p-6 shadow-lg cursor-pointer"
+            onclick="window.location.href='../src/pages/cars/Cars.html'"
+          >
+            <div
+              class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-4 mx-auto"
+            >
+              <svg
+                class="w-8 h-8 text-blue-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 text-center mb-2">
+              تخمين السيارات
+            </h3>
+            <p class="text-gray-600 text-center text-sm mb-4">
+              سيدان، SUV، دراجات نارية، شاحنات
+            </p>
+            <div class="bg-blue-50 rounded-lg p-3 text-center">
+              <span class="text-blue-600 font-semibold text-sm">
+                ابدأ التقييم
+              </span>
+            </div>
+          </div>
+
+          <!-- Equipment Card -->
+          <div
+            class="card-hover bg-white rounded-2xl p-6 shadow-lg cursor-pointer"
+            onclick="window.location.href='../src/pages/tools-instroments/Tools-Instroments.html'"
+          >
+            <div
+              class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-4 mx-auto"
+            >
+              <svg
+                class="w-8 h-8 text-blue-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 text-center mb-2">
+              المعدات والالات
+            </h3>
+            <p class="text-gray-600 text-center text-sm mb-4">
+              أجهزة ثقيلة ، معدات بناء، آلات صناعية
+            </p>
+            <div class="bg-blue-50 rounded-lg p-3 text-center">
+              <span class="text-blue-600 font-semibold text-sm">
+                ابدأ التقييم
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Estimations -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">تخميناتك الأخيرة</h3>
+          <div class="space-y-4">
+            <div
+              class="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
+            >
+              <div class="flex items-center space-x-3 space-x-reverse">
+                <div
+                  class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"
+                >
+                  <svg
+                    class="w-5 h-5 text-blue-600"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-800">
+                    شقة في نابلس - المخفية
+                  </p>
+                  <p class="text-sm text-gray-600">120 متر مربع</p>
+                </div>
+              </div>
+              <div class="text-left">
+                <p class="font-bold text-green-600">85,000 دينار</p>
+                <p class="text-xs text-gray-500">منذ يومين</p>
+              </div>
+            </div>
+
+            <div
+              class="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
+            >
+              <div class="flex items-center space-x-3 space-x-reverse">
+                <div
+                  class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"
+                >
+                  <svg
+                    class="w-5 h-5 text-green-600"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-800">تويوتا كامري 2018</p>
+                  <p class="text-sm text-gray-600">85,000 كم</p>
+                </div>
+              </div>
+              <div class="text-left">
+                <p class="font-bold text-green-600">12,500 دينار</p>
+                <p class="text-xs text-gray-500">منذ أسبوع</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- AI Assistant Button -->
+      <div class="fixed bottom-20 left-6 z-40">
+        <button
+          onclick="toggleAIChat()"
+          class="w-14 h-14 gradient-bg rounded-full shadow-lg flex items-center justify-center ai-pulse"
+        >
+          <svg
+            class="w-6 h-6 text-white"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- AI Chat Modal -->
+      <div
+        id="aiChatModal"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"
+      >
+        <div
+          class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 max-h-96 overflow-y-auto"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-gray-800">مساعد تخمين الذكي</h3>
+            <button
+              onclick="toggleAIChat()"
+              class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"
+            >
+              <svg
+                class="w-4 h-4 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <div class="space-y-4 mb-4">
+            <div class="bg-blue-50 p-4 rounded-2xl">
+              <p class="text-gray-800">
+                مرحباً! أنا مساعدك الذكي في تخمين. كيف يمكنني مساعدتك اليوم؟
+              </p>
+            </div>
+          </div>
+          <div class="flex space-x-2 space-x-reverse">
+            <input
+              type="text"
+              placeholder="اكتب رسالتك هنا..."
+              class="flex-1 p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Navigation -->
+      <nav
+        class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4"
+      >
+        <div class="flex justify-around">
+          <button class="flex flex-col items-center space-y-1 text-blue-600">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+            <span class="text-xs font-medium">الرئيسية</span>
+          </button>
+          <button
+            class="flex flex-col items-center space-y-1 text-black-400"
+            onclick="window.location.href='../src/pages/mytachmeen/MyTachmeen.html'"
+          >
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
+              />
+            </svg>
+            <span class="text-xs font-medium">تخميناتي</span>
+          </button>
+          <button
+            class="flex flex-col items-center space-y-1 text-black-400"
+            onclick="window.location.href='../src/pages/myaccount/MyAccount.html'"
+          >
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+              />
+            </svg>
+            <span class="text-xs font-medium">حسابي</span>
+          </button>
+          <button
+            class="flex flex-col items-center space-y-1 text-black-400"
+            onclick="window.location.href='../src/pages/settings/Settings.html'"
+          >
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+              />
+            </svg>
+            <span class="text-xs font-medium">الإعدادات</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+
+    <script>
+      // Show main app after splash screen
+      setTimeout(() => {
+        document.getElementById("mainApp").classList.remove("opacity-0");
+        document.getElementById("mainApp").classList.add("opacity-100");
+      }, 3000);
+
+      function openEstimation(type) {
+        let title = "";
+        switch (type) {
+          case "real-estate":
+            title = "تخمين العقارات";
+            break;
+          case "cars":
+            title = "تخمين السيارات";
+            break;
+          case "equipment":
+            title = "تخمين المعدات والآلات";
+            break;
+        }
+        alert(`سيتم فتح صفحة ${title} قريباً!`);
+      }
+
+      function toggleAIChat() {
+        const modal = document.getElementById("aiChatModal");
+        modal.classList.toggle("hidden");
+      }
+
+      // Close AI chat when clicking outside
+      document
+        .getElementById("aiChatModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            toggleAIChat();
+          }
+        });
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'974a8b4eb2945dab',t:'MTc1NjExOTE5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
